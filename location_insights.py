@@ -251,24 +251,19 @@ def render_location_map(location_df):
         axis=1
     )
     
-    # Determine map scope (regional vs global)
-    lat_range = map_df['lat'].max() - map_df['lat'].min()
-    lon_range = map_df['lon'].max() - map_df['lon'].min()
+    # Calculate center point and bounds for auto-fit viewport
+    center_lat = map_df['lat'].mean()
+    center_lon = map_df['lon'].mean()
     
-    # If all locations are within a small region (e.g., USA), zoom in
-    if lat_range < 50 and lon_range < 80:
-        # Regional map
-        center_lat = map_df['lat'].mean()
-        center_lon = map_df['lon'].mean()
-        
-        # Determine if it's USA-focused
-        if -130 < center_lon < -60 and 25 < center_lat < 50:
-            scope = "usa"
-        else:
-            scope = "world"
-    else:
-        # Global map
-        scope = "world"
+    # Calculate bounds with padding
+    lat_min = map_df['lat'].min()
+    lat_max = map_df['lat'].max()
+    lon_min = map_df['lon'].min()
+    lon_max = map_df['lon'].max()
+    
+    # Add 10% padding to bounds
+    lat_padding = (lat_max - lat_min) * 0.1 if lat_max != lat_min else 5
+    lon_padding = (lon_max - lon_min) * 0.1 if lon_max != lon_min else 5
     
     # Create the map with readiness-based colors and rich hover information
     fig = px.scatter_geo(
@@ -306,8 +301,31 @@ def render_location_map(location_df):
         }
     )
     
-    # Set explicit height for better display
-    fig.update_layout(height=600)
+    # Update marker size for better visibility
+    fig.update_traces(marker=dict(size=12))
+    
+    # Set explicit height and auto-fit viewport to champion locations
+    fig.update_layout(
+        height=750,
+        geo=dict(
+            center=dict(lat=center_lat, lon=center_lon),
+            projection_type='natural earth',
+            showland=True,
+            landcolor='rgb(243, 243, 243)',
+            coastlinecolor='rgb(204, 204, 204)',
+            showlakes=True,
+            lakecolor='rgb(255, 255, 255)',
+            showcountries=True,
+            countrycolor='rgb(204, 204, 204)',
+            lataxis=dict(
+                range=[lat_min - lat_padding, lat_max + lat_padding]
+            ),
+            lonaxis=dict(
+                range=[lon_min - lon_padding, lon_max + lon_padding]
+            )
+        ),
+        margin=dict(l=0, r=0, t=40, b=0)
+    )
     
     # Render Plotly map
     st.plotly_chart(fig, use_container_width=True)
