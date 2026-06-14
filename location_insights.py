@@ -270,12 +270,19 @@ def render_location_map(location_df):
         # Global map
         scope = "world"
     
-    # Create the map
+    # Create the map with readiness-based colors
     fig = px.scatter_geo(
         map_df,
         lat='lat',
         lon='lon',
-        hover_name='location'
+        color='color',
+        hover_name='location',
+        color_discrete_map={
+            'green': '#28a745',
+            'yellow': '#ffc107',
+            'red': '#dc3545',
+            'gray': '#6c757d'
+        }
     )
     
     # Set explicit height for better display

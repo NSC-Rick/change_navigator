@@ -6,6 +6,7 @@ import database as db
 from datetime import datetime
 import seed_data
 from project_workspace_page import initiative_workspace_page
+from champion_admin import render_champion_administration
 from summary_utils import generate_placeholder_summary
 
 # DEBUG: Log database file being used
@@ -383,13 +384,6 @@ def change_manager_dashboard():
                     status_color = "#28a745" if project['status'] == "Active" else "#6c757d"
                     st.markdown(f"<span style='background-color: {status_color}; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500;'>{project['status']}</span>", unsafe_allow_html=True)
                     
-                    # Open initiative workspace button
-                    if st.button("🔗 Open Initiative Workspace", key=f"open_{project['id']}", use_container_width=True):
-                        st.session_state.active_project_id = project['id']
-                        st.session_state.current_page = "Initiative Workspace"
-                        st.session_state.navigation_in_progress = True
-                        st.rerun()
-                    
                     st.markdown("<br>", unsafe_allow_html=True)
 
 def submit_observation():
@@ -556,8 +550,9 @@ def admin_page():
     st.header("⚙️ Administration")
     
     # Tabs for different admin sections
-    admin_tab1, admin_tab2, admin_tab3 = st.tabs([
+    admin_tab1, admin_tab2, admin_tab3, admin_tab4 = st.tabs([
         "🎯 Initiative Administration",
+        "👥 Change Champions",
         "🗄️ Database Management",
         "🔍 Data Integrity"
     ])
@@ -566,9 +561,12 @@ def admin_page():
         render_project_administration()
     
     with admin_tab2:
-        render_database_management()
+        render_champion_administration()
     
     with admin_tab3:
+        render_database_management()
+    
+    with admin_tab4:
         render_data_integrity_check()
 
 def render_project_administration():
