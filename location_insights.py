@@ -285,9 +285,9 @@ def render_location_map(location_df):
             'last_observation_date': True
         },
         color_discrete_map={
-            'green': '#28a745',
-            'yellow': '#ffc107',
-            'red': '#dc3545',
+            'green': '#2E7D32',
+            'yellow': '#F9A825',
+            'red': '#C62828',
             'gray': '#6c757d'
         },
         labels={
@@ -301,34 +301,65 @@ def render_location_map(location_df):
         }
     )
     
-    # Update marker size for better visibility
-    fig.update_traces(marker=dict(size=12))
+    # Update marker appearance for maximum visibility
+    fig.update_traces(
+        marker=dict(
+            size=20,
+            line=dict(width=2, color='white'),
+            opacity=1.0
+        )
+    )
     
-    # Set explicit height and auto-fit viewport to champion locations
+    # Set explicit height and auto-fit viewport with polished styling
     fig.update_layout(
         height=750,
         geo=dict(
             center=dict(lat=center_lat, lon=center_lon),
             projection_type='natural earth',
             showland=True,
-            landcolor='rgb(243, 243, 243)',
-            coastlinecolor='rgb(204, 204, 204)',
+            landcolor='rgb(245, 245, 245)',
+            oceancolor='rgb(220, 235, 250)',
+            coastlinecolor='rgb(150, 150, 150)',
+            coastlinewidth=0.8,
             showlakes=True,
-            lakecolor='rgb(255, 255, 255)',
+            lakecolor='rgb(220, 235, 250)',
             showcountries=True,
-            countrycolor='rgb(204, 204, 204)',
+            countrycolor='rgb(160, 160, 160)',
+            countrywidth=0.8,
+            showsubunits=True,
+            subunitcolor='rgb(190, 190, 190)',
+            subunitwidth=0.4,
+            showframe=False,
+            bgcolor='rgb(255, 255, 255)',
             lataxis=dict(
-                range=[lat_min - lat_padding, lat_max + lat_padding]
+                range=[lat_min - lat_padding, lat_max + lat_padding],
+                showgrid=False
             ),
             lonaxis=dict(
-                range=[lon_min - lon_padding, lon_max + lon_padding]
+                range=[lon_min - lon_padding, lon_max + lon_padding],
+                showgrid=False
             )
         ),
-        margin=dict(l=0, r=0, t=40, b=0)
+        margin=dict(l=0, r=0, t=40, b=0),
+        paper_bgcolor='rgb(255, 255, 255)',
+        plot_bgcolor='rgb(255, 255, 255)'
     )
     
-    # Render Plotly map
-    st.plotly_chart(fig, use_container_width=True)
+    # Render Plotly map in card-style container
+    st.markdown("""
+        <style>
+        .map-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    with st.container():
+        st.plotly_chart(fig, use_container_width=True)
     
     # Legend
     st.markdown("---")
