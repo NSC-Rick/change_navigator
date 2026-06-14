@@ -69,12 +69,40 @@ def render_map_tab(project_id, project):
         if pd.isna(lat) or pd.isna(lon):
             continue
         
+        # Collect champion details for hover information
+        champion_names = location_champions['champion_name'].tolist()
+        champion_roles = location_champions['role'].tolist() if 'role' in location_champions.columns else []
+        champion_departments = location_champions['department'].tolist()
+        
+        # Get most recent observation date for this location
+        last_obs_date = None
+        if len(observations_df) > 0:
+            location_obs = observations_df[observations_df['location'] == location]
+            if len(location_obs) > 0 and 'observation_date' in location_obs.columns:
+                last_obs_date = pd.to_datetime(location_obs['observation_date']).max().strftime('%Y-%m-%d')
+        
+        # Determine readiness status label
+        if pd.notna(avg_readiness):
+            if avg_readiness >= 8:
+                readiness_status = "Green"
+            elif avg_readiness >= 6:
+                readiness_status = "Yellow"
+            else:
+                readiness_status = "Red"
+        else:
+            readiness_status = "No Data"
+        
         location_stats.append({
             'location': location,
             'champion_count': champion_count,
             'observation_count': obs_count,
             'coverage_pct': coverage_pct,
             'avg_readiness': avg_readiness,
+            'readiness_status': readiness_status,
+            'champion_names': ', '.join(champion_names),
+            'champion_roles': ', '.join(champion_roles) if champion_roles else 'N/A',
+            'champion_departments': ', '.join(set(champion_departments)),
+            'last_observation_date': last_obs_date if last_obs_date else 'N/A',
             'lat': lat,
             'lon': lon
         })

@@ -270,18 +270,39 @@ def render_location_map(location_df):
         # Global map
         scope = "world"
     
-    # Create the map with readiness-based colors
+    # Create the map with readiness-based colors and rich hover information
     fig = px.scatter_geo(
         map_df,
         lat='lat',
         lon='lon',
         color='color',
         hover_name='location',
+        hover_data={
+            'lat': False,
+            'lon': False,
+            'color': False,
+            'champion_names': True,
+            'champion_roles': True,
+            'champion_departments': True,
+            'avg_readiness': ':.1f',
+            'readiness_status': True,
+            'observation_count': True,
+            'last_observation_date': True
+        },
         color_discrete_map={
             'green': '#28a745',
             'yellow': '#ffc107',
             'red': '#dc3545',
             'gray': '#6c757d'
+        },
+        labels={
+            'champion_names': 'Champions',
+            'champion_roles': 'Roles',
+            'champion_departments': 'Departments',
+            'avg_readiness': 'Readiness Score',
+            'readiness_status': 'Status',
+            'observation_count': 'Observations',
+            'last_observation_date': 'Last Observation'
         }
     )
     
