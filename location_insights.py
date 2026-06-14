@@ -75,37 +75,6 @@ def render_location_insights_tab(project_id, project):
     champions_df = db.get_champions_by_project(project_id)
     observations_df = db.get_observations_by_project(project_id)
     
-    # DIAGNOSTIC OUTPUT
-    with st.expander("🔍 DEBUG: Data Pipeline Diagnostics", expanded=False):
-        st.write("**Current Initiative/Project ID:**", project_id)
-        st.write("**Project ID Type:**", type(project_id))
-        
-        st.write("---")
-        st.write("**Champions DataFrame:**")
-        st.write(f"Row count: {len(champions_df)}")
-        st.write(f"Column names: {list(champions_df.columns)}")
-        st.write(f"Column dtypes:")
-        st.write(champions_df.dtypes)
-        
-        if len(champions_df) > 0:
-            st.write("**Sample data (first 3 rows):**")
-            st.dataframe(champions_df.head(3))
-            
-            st.write("**Location column analysis:**")
-            st.write(f"- Non-null locations: {champions_df['location'].notna().sum()}")
-            st.write(f"- Null locations: {champions_df['location'].isna().sum()}")
-            st.write(f"- Unique locations: {champions_df['location'].nunique()}")
-            
-            if 'latitude' in champions_df.columns and 'longitude' in champions_df.columns:
-                st.write("**Coordinate column analysis:**")
-                st.write(f"- Non-null latitudes: {champions_df['latitude'].notna().sum()}")
-                st.write(f"- Non-null longitudes: {champions_df['longitude'].notna().sum()}")
-                st.write(f"- Champions with both coordinates: {((champions_df['latitude'].notna()) & (champions_df['longitude'].notna())).sum()}")
-                
-                st.write("**Coordinate values:**")
-                coord_df = champions_df[['champion_name', 'location', 'latitude', 'longitude']].copy()
-                st.dataframe(coord_df)
-    
     if len(champions_df) == 0:
         st.info("No champions assigned to this initiative yet.")
         return
@@ -170,25 +139,6 @@ def render_location_insights_tab(project_id, project):
         })
     
     location_df = pd.DataFrame(location_stats)
-    
-    # DIAGNOSTIC OUTPUT - Location filtering results
-    with st.expander("🔍 DEBUG: Location Filtering Results", expanded=False):
-        st.write(f"**Total unique locations in champions_df:** {champions_df['location'].nunique()}")
-        st.write(f"**Locations processed:** {len(champions_df['location'].dropna().unique())}")
-        st.write(f"**Locations with valid coordinates (in location_df):** {len(location_df)}")
-        
-        if len(location_df) > 0:
-            st.write("**Location statistics dataframe:**")
-            st.dataframe(location_df)
-        else:
-            st.write("**⚠️ No locations passed the coordinate validation check**")
-            st.write("**Checking each location:**")
-            for location in champions_df['location'].dropna().unique():
-                location_champions = champions_df[champions_df['location'] == location]
-                location_champ = location_champions.iloc[0]
-                lat = location_champ.get('latitude')
-                lon = location_champ.get('longitude')
-                st.write(f"- {location}: lat={lat}, lon={lon}, is_null={pd.isna(lat) or pd.isna(lon)}")
     
     if len(location_df) == 0:
         st.info("No location data available.")
@@ -320,9 +270,7 @@ def render_location_map(location_df):
         # Global map
         scope = "world"
     
-    # Create the map - absolute simplest configuration
-    st.write(f"DEBUG: About to create figure with {len(map_df)} locations")
-    
+    # Create the map
     fig = px.scatter_geo(
         map_df,
         lat='lat',
@@ -330,12 +278,11 @@ def render_location_map(location_df):
         hover_name='location'
     )
     
-    st.write(f"DEBUG: Figure created, traces: {len(fig.data)}")
+    # Set explicit height for better display
+    fig.update_layout(height=600)
     
     # Render Plotly map
-    st.write("DEBUG: About to render chart")
     st.plotly_chart(fig, use_container_width=True)
-    st.write("DEBUG: Chart render complete")
     
     # Legend
     st.markdown("---")
