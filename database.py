@@ -404,6 +404,11 @@ def add_observation(project_id: int, champion_id: int, overall_status: str,
     conn = get_connection()
     cursor = conn.cursor()
     
+    # Ensure IDs are native Python integers, not numpy/pandas types
+    project_id = int(project_id)
+    champion_id = int(champion_id)
+    readiness_score = int(readiness_score)
+    
     observation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     print(f"  Executing INSERT...")

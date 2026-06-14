@@ -456,14 +456,17 @@ def submit_observation():
     with col1:
         if st.button("✅ Good", key="status_good", use_container_width=True, type="primary" if st.session_state.selected_status == "Green" else "secondary"):
             st.session_state.selected_status = "Green"
+            st.rerun()
     
     with col2:
         if st.button("⚠️ Mixed", key="status_mixed", use_container_width=True, type="primary" if st.session_state.selected_status == "Yellow" else "secondary"):
             st.session_state.selected_status = "Yellow"
+            st.rerun()
     
     with col3:
         if st.button("🚨 Concerned", key="status_concerned", use_container_width=True, type="primary" if st.session_state.selected_status == "Red" else "secondary"):
             st.session_state.selected_status = "Red"
+            st.rerun()
     
     overall_status = st.session_state.selected_status
     
@@ -513,8 +516,8 @@ def submit_observation():
             st.write(f"Readiness: {readiness_score}")
             
             observation_id = db.add_observation(
-                project_id=project_id,
-                champion_id=champion_id,
+                project_id=int(project_id),
+                champion_id=int(champion_id),
                 overall_status=overall_status,
                 readiness_score=readiness_score,
                 what_are_you_hearing=what_hearing,
